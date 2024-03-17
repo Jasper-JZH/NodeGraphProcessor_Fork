@@ -5,7 +5,7 @@
 /[Bb]uilds/
 /[Ll]ogs/
 /Assets/AssetStoreTools*
-/Assets/Plugins/Sirenix/
+# 开启/Assets/Plugins/Sirenix/
 
 # Visual Studio 2015 cache directory
 /.vs/
