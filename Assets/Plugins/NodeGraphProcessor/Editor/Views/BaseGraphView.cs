@@ -126,8 +126,13 @@ namespace GraphProcessor
 
 		Dictionary<Type, (Type nodeType, MethodInfo initalizeNodeFromObject)> nodeTypePerCreateAssetType = new Dictionary<Type, (Type, MethodInfo)>();
 
+		/// <summary>
+		/// N_BaseGraphView的构造函数
+		/// </summary>
+		/// <param name="window"></param>
 		public BaseGraphView(EditorWindow window)
 		{
+			// N_注册一些事件，一些基础功能比如缩放，拖拽等
 			serializeGraphElements = SerializeGraphElementsCallback;
 			canPasteSerializedData = CanPasteSerializedDataCallback;
 			unserializeAndPaste = UnserializeAndPasteCallback;
@@ -142,14 +147,16 @@ namespace GraphProcessor
 			RegisterCallback< MouseUpEvent >(MouseUpCallback);
 
 			InitializeManipulators();
-
+			// N_设置缩放
 			SetupZoom(0.05f, 2f);
 
 			Undo.undoRedoPerformed += ReloadView;
-
+			
+			// N_CreateNodeMenuWindow初始化
 			createNodeMenu = ScriptableObject.CreateInstance< CreateNodeMenuWindow >();
 			createNodeMenu.Initialize(this, window);
-
+			
+			// N_用于Inspector显示的Nodelnspector
 			if (nodeInspector == null)
 				nodeInspector = CreateNodeInspectorObject();
 
@@ -688,6 +695,11 @@ namespace GraphProcessor
 			EditorCoroutineUtility.StartCoroutine(this.Initialize(this.graph), this);
 		}
 
+		/// <summary>
+		/// N_初始化BaseGraphView
+		/// </summary>
+		/// <param name="graph"></param>
+		/// <returns></returns>
 		public IEnumerator Initialize(BaseGraph graph)
 		{
 			if (this.graph != null)
@@ -714,22 +726,22 @@ namespace GraphProcessor
 
 			ClearGraphElements();
 
-			InitializeGraphView();
+			InitializeGraphView();	// N_注册一些View上操作和事件的回调
 			
-			yield return InitializeNodeViews();
+			yield return InitializeNodeViews();	// N_初始化所有NodeView
 			
-			yield return InitializeEdgeViews();
-			yield return InitializeViews();
-			yield return InitializeGroups();
-			yield return InitializeStickyNotes();
-			yield return InitializeStackNodes();
+			yield return InitializeEdgeViews();		// N_连线
+			yield return InitializeViews();			// N_初始化悬浮窗
+			yield return InitializeGroups();		// N_初始化GroupView
+			yield return InitializeStickyNotes();	// N_初始化StickyNoteView
+			yield return InitializeStackNodes();	// N_初始化StackNodeView
 
 			initialized?.Invoke();
 			UpdateComputeOrder();
 
 			InitializeView();
 
-			NodeProvider.LoadGraph(graph);
+			NodeProvider.LoadGraph(graph);	// N_构建Type与反射字段缓存。
 
 			// Register the nodes that can be created from assets
 			foreach (var nodeInfo in NodeProvider.GetNodeMenuEntries(graph))
@@ -918,15 +930,20 @@ namespace GraphProcessor
 			return view;
 		}
 
+		/// <summary>
+		/// N_根据Node实例的Type类型，创建对应的NodeView加入GraphView中。最后都存入nodeViews中。
+		/// </summary>
+		/// <param name="node"></param>
+		/// <returns></returns>
 		public BaseNodeView AddNodeView(BaseNode node)
 		{
-			var viewType = NodeProvider.GetNodeViewTypeFromType(node.GetType());
+			var viewType = NodeProvider.GetNodeViewTypeFromType(node.GetType());	// N_根据node的Type获取对应nodeView的Type
 
 			if (viewType == null)
 				viewType = typeof(BaseNodeView);
 
-			var baseNodeView = Activator.CreateInstance(viewType) as BaseNodeView;
-			baseNodeView.Initialize(this, node);
+			var baseNodeView = Activator.CreateInstance(viewType) as BaseNodeView;	// N_利用反射根据viewType创建实例
+			baseNodeView.Initialize(this, node);	// N_对创建的NodeView实例进行初始化
 			AddElement(baseNodeView);
 
 			nodeViews.Add(baseNodeView);

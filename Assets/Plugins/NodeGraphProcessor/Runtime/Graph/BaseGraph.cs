@@ -9,6 +9,7 @@ using UnityEngine.SceneManagement;
 
 namespace GraphProcessor
 {
+	// N_表示Graph中发生的变化，作为onGraphChanges事件的参数
 	public class GraphChanges
 	{
 		public SerializableEdge	removedEdge;
@@ -29,11 +30,12 @@ namespace GraphProcessor
 	/// </summary>
 	public enum ComputeOrderType
 	{
+		// N_节点处理是深度优先 / 广度优先
 		DepthFirst,
 		BreadthFirst,
 	}
 	
-	public class BaseGraph : SerializedScriptableObject
+	public class BaseGraph : SerializedScriptableObject	// N_继承自Odin中的SerializedScriptableObject，使BaseGraph为可序列化的SO
 	{
 		static readonly int			maxComputeOrderDepth = 1000;
 		
@@ -162,25 +164,38 @@ namespace GraphProcessor
 		
 		public HashSet< BaseNode >		graphOutputs { get; private set; } = new HashSet<BaseNode>();
 
+		/// <summary>
+		/// N_每次打开Graph都会调用
+		/// </summary>
         public void OnGraphEnable()
         {
+	        Debug.Log("OnGraphEnable called!");
 			if (isEnabled)
 				return;
-
+			
 			MigrateGraphIfNeeded();
-			InitializeGraphElements();
+			InitializeGraphElements();	
 			DestroyBrokenGraphElements();
 			UpdateComputeOrder();
 			isEnabled = true;
         }
 
+		/// <summary>
+		/// N_初始化Graph中的节点(Node)和连线(Edge)
+		/// </summary>
 		void InitializeGraphElements()
 		{
 			// Sanitize the element lists (it's possible that nodes are null if their full class name have changed)
 			// If you rename / change the assembly of a node or parameter, please use the MovedFrom() attribute to avoid breaking the graph.
 			nodes.RemoveAll(n => n == null);
+			// N_RemoveAll()方法接收一个Predicate<T>委托作为参数（Predicate可翻译成“断言”），这个委托接受一个参数并返回一个布尔值。
+			// 在这个例子中，Predicate<T>委托就是Lambda表达式n => n == null，它用于测试列表中的每个元素是否满足条件（即是否为null）。
+			// 如果满足条件（返回true），则从列表中移除该元素。
+			
 			exposedParameters.RemoveAll(e => e == null);
+			// N_这两个RemoveAll就是清空nodes和exposedParameters中的null元素
 
+			// N_缓存所有从SO中读取的Node数据并存入Dic中方便查询，同时初始化每个Node
 			foreach (var node in nodes.ToList())
 			{
 				nodesPerGUID[node.GUID] = node;
@@ -460,6 +475,9 @@ namespace GraphProcessor
 			InitializeGraphElements();
 		}
 
+		/// <summary>
+		/// N_迁移Graph中的数据（如果需要？）
+		/// </summary>
 		public void MigrateGraphIfNeeded()
 		{
 #pragma warning disable CS0618

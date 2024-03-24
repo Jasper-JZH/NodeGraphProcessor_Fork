@@ -43,6 +43,9 @@ namespace GraphProcessor
 
 		static NodeDescriptions							genericNodes = new NodeDescriptions();
 
+		/// <summary>
+		/// N_静态构造函数，在类被加载到内存时自动调用一次
+		/// </summary>
 		static NodeProvider()
 		{
 			BuildNodeViewCache();
@@ -77,6 +80,9 @@ namespace GraphProcessor
 			specificNodeDescriptions.Remove(graph);
 		}
 
+		/// <summary>
+		/// N_构建脚本缓存，用于快速找到一个Node对应的View和Data脚本
+		/// </summary>
 		static void BuildNodeViewCache()
 		{
 			foreach (var nodeViewType in TypeCache.GetTypesDerivedFrom<BaseNodeView>())
@@ -91,6 +97,9 @@ namespace GraphProcessor
 			}
 		}
 		
+		/// <summary>
+		/// N_构建Node反射数据缓存
+		/// </summary>
 		static void BuildGenericNodeCache()
 		{
 			foreach (var nodeType in TypeCache.GetTypesDerivedFrom<BaseNode>())
@@ -105,6 +114,12 @@ namespace GraphProcessor
 			}
 		}
 
+		/// <summary>
+		/// N_初始化用于创建Node的Attribute信息
+		/// </summary>
+		/// <param name="nodeType"></param>
+		/// <param name="targetDescription"></param>
+		/// <param name="graph"></param>
 		static void BuildCacheForNode(Type nodeType, NodeDescriptions targetDescription, BaseGraph graph = null)
 		{
 			var attrs = nodeType.GetCustomAttributes(typeof(NodeMenuItemAttribute), false) as NodeMenuItemAttribute[];
@@ -171,6 +186,13 @@ namespace GraphProcessor
 		}
 
 		static FieldInfo SetGraph = typeof(BaseNode).GetField("graph", BindingFlags.NonPublic | BindingFlags.Instance);
+		
+		/// <summary>
+		/// N_构建Node的Port反射相关信息，新建一个临时BaseNode来获取反射数据
+		/// </summary>
+		/// <param name="nodeType"></param>
+		/// <param name="targetDescription"></param>
+		/// <param name="graph"></param>
 		static void ProvideNodePortCreationDescription(Type nodeType, NodeDescriptions targetDescription, BaseGraph graph = null)
 		{
 			var node = Activator.CreateInstance(nodeType) as BaseNode;

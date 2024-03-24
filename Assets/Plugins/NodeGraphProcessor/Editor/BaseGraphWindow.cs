@@ -107,6 +107,7 @@ namespace GraphProcessor
 		/// <param name="graph"></param>
 		public void InitializeGraph(BaseGraph graph)
 		{
+			// N_保存之前打开的旧的Graph。
 			if (this.graph != null && graph != this.graph)
 			{
 				// Save the graph to the disk
@@ -115,6 +116,7 @@ namespace GraphProcessor
 				graphUnloaded?.Invoke(this.graph);
 			}
 
+			// N_打开并初始化新的Graph
 			graphLoaded?.Invoke(graph);
 			this.graph = graph;
 
@@ -126,6 +128,7 @@ namespace GraphProcessor
 			InitializeWindow(graph);
 			rootView.Add(graphView);
 			
+			//N_初始化GraphView
 			graphView = rootView.Children().FirstOrDefault(e => e is BaseGraphView) as BaseGraphView;
 
 			if (graphView == null)

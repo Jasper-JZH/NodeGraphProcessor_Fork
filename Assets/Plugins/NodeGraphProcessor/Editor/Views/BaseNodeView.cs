@@ -76,6 +76,11 @@ namespace GraphProcessor
 		
 		#region  Initialization
 		
+		/// <summary>
+		/// N_进行NodeView相关Style的加载
+		/// </summary>
+		/// <param name="owner"></param>
+		/// <param name="node"></param>
 		public void Initialize(BaseGraphView owner, BaseNode node)
 		{
 			nodeTarget = node;
@@ -97,9 +102,9 @@ namespace GraphProcessor
             if (!string.IsNullOrEmpty(node.layoutStyle))
                 styleSheets.Add(Resources.Load<StyleSheet>(node.layoutStyle));
 
-			InitializeView();
-			InitializePorts();
-			InitializeDebug();
+			InitializeView();	// N_加载NodeView主体的Style
+			InitializePorts();	// N_根据Node的input/outputPorts信息，添加Ports
+			InitializeDebug();	// N_Debug模块UI的加载
 
 			// If the standard Enable method is still overwritten, we call it
 			if (GetType().GetMethod(nameof(Enable), new Type[]{}).DeclaringType != typeof(BaseNodeView))

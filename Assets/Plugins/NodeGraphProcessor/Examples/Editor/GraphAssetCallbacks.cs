@@ -31,13 +31,16 @@ public class GraphAssetCallbacks
 		ProjectWindowUtil.CreateAsset(graph, "SkillGraph.asset");
 	}
 
+	// N_打开NodeGraph资源文件时调用
 	[OnOpenAsset(0)]
 	public static bool OnBaseGraphOpened(int instanceID, int line)
 	{
+		Debug.Log("N_OnBaseGraphOpened！");
 		var baseGraph = EditorUtility.InstanceIDToObject(instanceID) as BaseGraph;
 		return InitializeGraph(baseGraph);
 	}
 
+	// N_初始化一个Graph视图窗口
 	public static bool InitializeGraph(BaseGraph baseGraph)
 	{
 		if (baseGraph == null) return false;

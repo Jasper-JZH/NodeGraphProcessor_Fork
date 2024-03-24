@@ -14,6 +14,7 @@ public class FloatNode : BaseNode
 
     protected override void Process()
     {
+        Debug.Log("FloatNode Process");
         TryGetInputValue(nameof(input), ref input);
         output = input;
     }

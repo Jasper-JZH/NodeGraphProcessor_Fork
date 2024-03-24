@@ -136,9 +136,11 @@ namespace GraphProcessor
 		/// </summary>
 		public bool					createdWithinGroup {get; internal set; } = false;
 
+		// N_节点字段信息
 		[NonSerialized]
 		internal Dictionary< string, NodeFieldInformation >	nodeFields = new Dictionary< string, NodeFieldInformation >();
 
+		// N_自定义端口行为
 		[NonSerialized]
 		internal Dictionary< Type, CustomPortTypeBehaviorDelegate> customPortTypeBehaviorMap = new Dictionary<Type, CustomPortTypeBehaviorDelegate>();
 
@@ -229,9 +231,11 @@ namespace GraphProcessor
 		// called by the BaseGraph when the node is added to the graph
 		public void Initialize(BaseGraph graph)
 		{
-			this.graph = graph;
+			Debug.Log("Initialize node " + name);
+			this.graph = graph;	// N_注入Graph依赖（将节点与其所在图形关联起来）
 
 			ExceptionToLog.Call(() => Enable());
+			// N_创建并初始化节点的输入输出端口
 			inputPorts = new NodeInputPortContainer(this);
 			outputPorts = new NodeOutputPortContainer(this);
 			nodeFields = new Dictionary<string, NodeFieldInformation>();
